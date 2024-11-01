@@ -5,19 +5,28 @@ import React, { useEffect, useState } from 'react';
 function App() {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
-  const [leaderboard, setLeaderboard] = useState([]);
   const [amount, setAmount] = useState('');
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [network, setNetwork] = useState('eth_mainnet');
+  const [blockchainAddress, setBlockchainAddress] = useState('');
+  const [transactionMessage, setTransactionMessage] = useState('');
 
   // Function to handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:7000/api/transactions', {
+      const response = await axios.post('http://127.0.0.1:7001/api/transactions', {
         user_name: name,
         message,
-        amount: parseFloat(amount)
+        amount: parseFloat(amount),
+        blockchain_network: network
       });
       console.log('Transaction successful:', response.data);
+      
+      // Set the blockchain address and message
+      setBlockchainAddress(response.data.blockchain_address);
+      setTransactionMessage(`Send your crypto to the following address: ${response.data.blockchain_address}`);
+      
       fetchLeaderboard(); // Update the leaderboard
     } catch (error) {
       console.error('Error making transaction:', error);
@@ -27,8 +36,8 @@ function App() {
   // Function to fetch the leaderboard from the API
   const fetchLeaderboard = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:7000/api/leaderboard');
-      setLeaderboard(response.data['leaderboard']);
+      const response = await axios.get('http://127.0.0.1:7001/api/leaderboard');
+      setLeaderboard(response.data);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
     }
@@ -78,14 +87,36 @@ function App() {
             required
           />
         </div>
+        <div className="mb-3">
+          <label htmlFor="network" className="form-label">Select Blockchain Network</label>
+          <select
+            id="network"
+            className="form-select"
+            value={network}
+            onChange={(e) => setNetwork(e.target.value)}
+            required
+          >
+            <option value="eth_mainnet">Ethereum Mainnet</option>
+            <option value="eth_sepolia">Ethereum Sepolia</option>
+            <option value="bitcoin_mainnet">Bitcoin Mainnet</option>
+            <option value="bitcoin_testnet">Bitcoin Testnet</option>
+            <option value="fiat">FIAT</option>
+          </select>
+        </div>
         <button type="submit" className="btn btn-primary w-100">Pay and Play</button>
       </form>
+
+      {blockchainAddress && (
+        <div className="alert alert-info">
+          {transactionMessage}
+        </div>
+      )}
 
       <h2 className="text-center">Leaderboard</h2>
       <ul className="list-group">
         {leaderboard.map((entry, index) => (
           <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-            {entry.name}
+            {entry.user_name}
             <span>${entry.amount}</span>
           </li>
         ))}

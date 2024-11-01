@@ -52,7 +52,7 @@ def submit_transaction(transaction: CreateTransactionRequest, db=Depends(get_db)
             encrypted_private_key,
 
         )
-        return {"status": "success", "transaction_id": transaction_id}
+        return {"status": "success", "transaction_id": transaction_id, "blockchain_address": blockchain_address.address}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing transaction: {e}")
 
@@ -68,4 +68,4 @@ def leaderboard(db=Depends(get_db)) -> List[LeaderboardEntryResponse]:
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=7000)
+    uvicorn.run(app, host="127.0.0.1", port=7001)
