@@ -1,6 +1,7 @@
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect, useState } from 'react';
+import { FaExternalLinkAlt } from 'react-icons/fa'; // Import an external link icon
 
 function App() {
   const [name, setName] = useState('');
@@ -113,14 +114,30 @@ function App() {
       )}
 
       <h2 className="text-center">Leaderboard</h2>
-      <ul className="list-group">
-        {leaderboard.map((entry, index) => (
-          <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-            {entry.user_name}
-            <span>${entry.amount}</span>
-          </li>
-        ))}
-      </ul>
+      <table className="table table-striped">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Message</th>
+            <th>Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leaderboard.map((entry, index) => (
+            <tr key={index}>
+              <td>{entry.user_name}</td>
+              <td>{entry.message}</td>
+              <td>${entry.amount}</td>
+              <td>
+                <a href={`${entry.tracking_url}`} target="_blank" rel="noopener noreferrer">
+                  <FaExternalLinkAlt />
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -116,7 +116,7 @@ def fetch_leaderboard(connection: _connection) -> List[LeaderboardEntry]:
 
     with connection.cursor() as cursor:
         query = """
-                SELECT user_name, message, amount_usd
+                SELECT user_name, message, amount_usd, blockchain_address, blockchain_network
                 FROM transactions
                 WHERE status = %(status)s
                 ORDER BY amount_usd DESC
@@ -124,5 +124,5 @@ def fetch_leaderboard(connection: _connection) -> List[LeaderboardEntry]:
             """
         cursor.execute(query, {'status': TransactionStatus.COMPLETED.value})
         rows = cursor.fetchall()
-        leaderboard = [LeaderboardEntry(row[0], row[1], row[2])for row in rows]
+        leaderboard = [LeaderboardEntry(row[0], row[1], row[2], row[3], BlockchainNetwork(row[4]))for row in rows]
     return leaderboard

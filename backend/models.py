@@ -32,10 +32,12 @@ class TransactionStatus(Enum):
 
 
 class LeaderboardEntry:
-    def __init__(self, user_name: str, message: Optional[str], amount: float):
+    def __init__(self, user_name: str, message: Optional[str], amount: float, blockchain_address: str, blockchain_network: BlockchainNetwork):
         self.user_name = user_name
         self.message = message
         self.amount = amount
+        self.blockchain_address = blockchain_address
+        self.blockchain_network = blockchain_network
 
 
 class Currency(Enum):
@@ -59,3 +61,16 @@ def get_currency(network: BlockchainNetwork) -> Currency:
         return Currency.USD
     else:
         raise ValueError("Invalid blockchain network")
+
+
+def get_transaction_tracking_url(blockchain_address: str, blockchain_network: BlockchainNetwork) -> str:
+    if blockchain_network == BlockchainNetwork.ETH_MAINNET:
+        return f"https://etherscan.io/address/{blockchain_address}"
+    elif blockchain_network == BlockchainNetwork.ETH_SEPOLIA:
+        return f"https://sepolia.etherscan.io/address/{blockchain_address}"
+    elif blockchain_network == BlockchainNetwork.BTC_MAINNET:
+        return f"https://blockchain.com/address/{blockchain_address}"
+    elif blockchain_network == BlockchainNetwork.BTC_TESTNET:
+        return f"https://blockchain.com/testnet/address/{blockchain_address}"
+    else:
+        return ""

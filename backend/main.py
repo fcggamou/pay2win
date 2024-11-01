@@ -10,7 +10,7 @@ from db import fetch_leaderboard, get_db, insert_transaction
 from encryption import encrypt
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from models import get_currency
+from models import get_currency, get_transaction_tracking_url
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -30,6 +30,7 @@ class LeaderboardEntryResponse(BaseModel):
     user_name: str
     message: str
     amount: float
+    tracking_url: str
 
 
 @app.post("/api/transactions")
@@ -61,7 +62,7 @@ def submit_transaction(transaction: CreateTransactionRequest, db=Depends(get_db)
 def leaderboard(db=Depends(get_db)) -> List[LeaderboardEntryResponse]:
     try:
         leaderboard_entries = fetch_leaderboard(db)
-        return [LeaderboardEntryResponse(user_name=entry.user_name, message=entry.message, amount=entry.amount) for entry in leaderboard_entries]
+        return [LeaderboardEntryResponse(user_name=entry.user_name, message=entry.message, amount=entry.amount, tracking_url=get_transaction_tracking_url(entry.blockchain_address, entry.blockchain_network)) for entry in leaderboard_entries]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching leaderboard: {e}")
 
